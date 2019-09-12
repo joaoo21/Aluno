@@ -8,6 +8,11 @@ import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import javax.swing.JOptionPane;
 import Modelo.Aluno;
+import tela.manutencao.ManutencaoAluno;
+
+import java.sql.ResultSet;
+import java.util.ArrayList;
+import java.util.List;
 /**
  *
  * @author Administrador
@@ -39,7 +44,7 @@ public class DaoAluno {
         }
     }
         public static boolean alterar(Aluno objeto) {
-        String sql = "UPDATE produto SET nome = ?, endereco = ? WHERE codigo=?";
+        String sql = "UPDATE aluno SET nome = ?, endereco = ? WHERE codigo=?";
         try {
             PreparedStatement ps = conexao.Conexao.getConexao().prepareStatement(sql);
             ps.setString(1, objeto.getNome()); 
@@ -57,7 +62,7 @@ public class DaoAluno {
         //definir todos os atributos
         objeto.setCodigo(Integer.parseInt(man.jtfCodigo.getText()));
         objeto.setNome(man.jtfNome.getText());
-        objeto.setDescricao(man.jtfDescricao.getText());
+        objeto.setEndereco(man.jtfEndereco.getText());
         
         boolean resultado = DaoAluno.alterar(objeto);
         if (resultado) {
@@ -66,4 +71,42 @@ public class DaoAluno {
             JOptionPane.showMessageDialog(null, "Erro!");
         }
     }
+        
+          public static boolean excluir(Aluno objeto) {
+        String sql = "DELETE FROM aluno WHERE codigo=?";
+        try {
+            PreparedStatement ps = conexao.Conexao.getConexao().prepareStatement(sql);
+            ps.setInt(1, objeto.getCodigo());
+            ps.executeUpdate();
+            return true;
+        } catch (SQLException | ClassNotFoundException ex) {
+            System.out.println(ex.getMessage());
+            return false;
+        }
+    }
+          
+          
+          public static List<Aluno> consultar() {
+        List<Aluno> resultados = new ArrayList<>();
+        //editar o SQL conforme a entidade
+        String sql = "SELECT codigo, nome, endereco FROM aluno";
+        PreparedStatement ps;
+        try {
+            ps = conexao.Conexao.getConexao().prepareStatement(sql);
+            ResultSet rs = ps.executeQuery();
+            while (rs.next()) {
+                Aluno objeto = new Aluno();
+                //definir um set para cada atributo da entidade, cuidado com o tipo
+                objeto.setCodigo(rs.getInt("codigo"));
+                objeto.setNome(rs.getString("nome"));
+                objeto.setEndereco(rs.getString("endereco"));
+                
+                resultados.add(objeto);//não mexa nesse, ele adiciona o objeto na lista
+            }
+            return resultados;
+        } catch (SQLException | ClassNotFoundException ex) {
+            System.out.println(ex.getMessage());
+            return null;
+        }
+}
 }
